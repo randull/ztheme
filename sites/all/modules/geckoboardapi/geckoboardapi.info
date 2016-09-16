@@ -1,0 +1,10 @@
+name = "Geckoboard API"
+description = "Allows modules to integrate with Geckoboard by providing service hooks."
+core = "7.x"
+
+; Information added by drupal.org packaging script on 2013-06-17
+version = "7.x-1.0"
+core = "7.x"
+project = "geckoboardapi"
+datestamp = "1371490853"
+
