@@ -1,0 +1,87 @@
+/*
+ * Mixins - grid.
+ * Add all grid-related mixins in this file.
+ */
+
+/* Omega reset */
+@mixin omega-reset($nth) {
+  &:nth-child(#{$nth}) {
+    margin-right: $grid-padding;
+  }
+
+  &:nth-child(#{$nth}+1) {
+    clear: none
+  }
+}
+
+/* Column layouts */
+@mixin col_2 {
+  margin: 0 0 25px 0;
+
+  @include media($breakpoint_2, true) {
+    @include span-columns(6 of 12);
+  }
+
+  &.views-row-even {
+    @include omega;
+  }
+}
+
+@mixin col_3 {
+  @include span-columns(12 of 12);
+
+  @include media($breakpoint_1, true) {
+    @include span-columns(6 of 12);
+    @include omega(2n);
+  }
+
+  @include media($breakpoint_2, true) {
+    @include omega-reset(2n);
+    @include span-columns(4 of 12);
+    @include omega(3n);
+  }
+}
+
+@mixin col_4 {
+  @include media($breakpoint_1, true) {
+    @include span-columns(6 of 12);
+
+    &:nth-child(2n) {
+      @include omega;
+    }
+  }
+
+  @include media($breakpoint_2, true) {
+    @include span-columns(3 of 12);
+
+    &:nth-child(3n + 1) {
+      clear: none !important;
+    }
+
+    &:nth-child(4n) {
+      @include omega;
+    }
+
+    &:nth-child(4n + 1) {
+      clear: both;
+    }
+  }
+}
+
+@mixin col_6 {
+  @include span-columns(6 of 12);
+  @include omega(2n);
+
+  @include media($breakpoint_1, true) {
+    @include span-columns(4 of 12);
+    @include omega-reset(2n);
+    @include omega(3n);
+  }
+
+  @include media($breakpoint_3, true) {
+    @include span-columns(2 of 12);
+    @include omega-reset(3n);
+    @include omega(6n);
+    margin-bottom: 0px;
+  }
+}
