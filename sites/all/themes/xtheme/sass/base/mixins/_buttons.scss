@@ -1,0 +1,26 @@
+/*
+ * Mixins - buttons
+ * Add all button-related mixins in this file.
+ */
+
+@mixin button {
+  @include transition(all 150ms linear);
+  -o-transition: all 150ms linear;
+  -ms-transition: all 150ms linear;
+  background: $white;
+  border: 1px solid $base-link-color;
+  border-radius: 3px;
+  box-shadow: none;
+  color: $base-link-color;
+  padding: 6px 10px 5px 10px;
+  text-shadow: none;
+  text-transform: lowercase;
+  -webkit-font-smoothing: antialiased;
+
+  &:hover,
+  &:focus {
+    background: $base-link-color;
+    color: $white;
+    outline: none;
+  }
+}

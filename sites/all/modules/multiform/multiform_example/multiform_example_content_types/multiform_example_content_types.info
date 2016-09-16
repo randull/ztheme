@@ -1,0 +1,22 @@
+name = Multiform Example Content types
+description = Contains content types, required for multiform examples.
+core = 7.x
+package = Multiform
+dependencies[] = features
+dependencies[] = text
+features[features_api][] = api:2
+features[field_base][] = body
+features[field_base][] = field_multiform_shared
+features[field_instance][] = node-multiform_base-body
+features[field_instance][] = node-multiform_base-field_multiform_shared
+features[field_instance][] = node-multiform_dependent-body
+features[field_instance][] = node-multiform_dependent-field_multiform_shared
+features[node][] = multiform_base
+features[node][] = multiform_dependent
+
+; Information added by Drupal.org packaging script on 2015-01-19
+version = "7.x-2.x-dev"
+core = "7.x"
+project = "multiform"
+datestamp = "1421691706"
+
