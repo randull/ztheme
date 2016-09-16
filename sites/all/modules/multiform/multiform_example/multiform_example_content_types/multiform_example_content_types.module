@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Multiform Example Content types feature.
+ */
+
+include_once 'multiform_example_content_types.features.inc';
