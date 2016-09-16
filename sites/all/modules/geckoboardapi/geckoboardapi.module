@@ -1,0 +1,127 @@
+<?php
+
+/**
+ * Implements hook_menu().
+ */
+function geckoboardapi_menu() {
+  $items = array();
+
+
+  $items['api/geckoboard/%'] = array(
+    'title' => 'Geckoboard API endpoint',
+    'page callback' => 'geckoboardapi_endpoint',
+    'page arguments' => array(2),
+    'access callback' => 'geckoboardapi_access',
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['admin/config/services/geckoboard'] = array(
+    'title' => 'Geckoboard',
+    'description' => 'Integrate your site with Geckoboard.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('geckoboardapi_admin_form'),
+    'access arguments' => array('administer geckoboard'),
+  );
+
+  return $items;
+}
+
+
+/**
+ * Implements hook_permission().
+ */
+function geckoboardapi_permission() {
+  return array('administer geckoboard' => array(
+    'title' => 'Administer GeckoBoard',
+  ));
+}
+
+
+/**
+ * Geckboard API endpoint
+ */
+function geckoboardapi_endpoint($service) {
+  $types = array(
+    1 => 'number',
+    2 => 'rag_column',
+    3 => 'rag',
+    4 => 'text',
+    5 => 'piechart',
+    6 => 'linechart',
+    7 => 'geckometer',
+    8 => 'funnelchart',
+    9 => 'bulletgraph',
+    10 => 'highchart',
+    11 => 'map'
+  );
+
+  $services = module_invoke_all('geckoboardapi');
+
+  // Check the service exists
+  if (!isset($services[$service])) {
+    return geckoboard_return_error('no matching service configured');
+  }
+
+  // Check the service is the correct widget type
+  $service = $services[$service];
+  if (!isset($_REQUEST['type']) || $_REQUEST['type'] !== $service['type']) {
+    //return geckboard_return_error('widget types do not match');
+    // GeckoBoard does not send "type" with a POST request ... need to investigate.
+  }
+
+  // Check that we are providing JSON not XML (why bother with XML)
+  if (!isset($_REQUEST['format']) || $_REQUEST['format'] !== 'json') {
+    // GeckoBoard does not send format in a POST request either ...
+    //return geckboard_return_error('format error -- please use JSON');
+  }
+
+  // Check the function exists
+  $callback = $service['callback'];
+  if (!function_exists($callback)) {
+    return geckboard_return_error('service module did not define callback properly');
+  }
+
+  // Everything seems legit
+  $result = $callback();
+
+  // GeckoBoard does not like the garbage that drupal_json_encode spits out for HTML encoding.
+  drupal_add_http_header('Content-Type', 'application/json');
+  echo json_encode($result);
+}
+
+
+/**
+ * Settings form
+ */
+function geckoboardapi_admin_form() {
+  $form = array();
+
+  $form['geckboardapi_secret'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Geckoboard secret key'),
+    '#description' => t('Set this value to be the same as you set for API Username in the Geckoboard widget configuration. This is randomly generated the first time you view this page, you must save the form for the key to be saved.'),
+    '#default_value' => variable_get('geckboardapi_secret', user_password(20)),
+  );
+
+  return system_settings_form($form);
+}
+
+
+/**
+ * Access check for endpoint
+ *
+ * @todo Send a JSON response rather than standard 403
+ */
+function geckoboardapi_access() {
+  return user_access('administer geckoboard') || (isset($_SERVER['PHP_AUTH_USER'])
+    && $_SERVER['PHP_AUTH_USER'] === variable_get('geckboard_secret', ''));
+}
+
+
+/**
+ * Return an error geckoboard understands
+ */
+function geckoboardapi_return_error($error) {
+  drupal_add_http_header('Status', '500 Internal Server Error');
+  return drupal_json_output(array('error' => $error));
+}
