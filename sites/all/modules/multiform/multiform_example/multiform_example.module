@@ -1,0 +1,239 @@
+<?php
+
+/**
+ * Implements hook_menu().
+ */
+function multiform_example_menu() {
+  $items['multiform-example'] = array(
+    'title' => 'Multiform Example',
+    'page callback' => 'multiform_example_page',
+    'access callback' => TRUE,
+  );
+  $items['multiform-sharedfields-example'] = array(
+    'title' => 'Multiform Sharedfields Example',
+    'page callback' => 'multiform_sharedfields_example_page',
+    'access callback' => TRUE,
+    'file' => 'multiform_example.sharedfields.inc',
+  );
+  return $items;
+}
+
+
+/**
+ * Implements hook_theme().
+ */
+function multiform_example_theme() {
+  // Template name must be the same as #multiform_id setting value.
+  return array(
+    'multiform_example_generic' => array(
+      'render element' => 'form',
+      'template' => 'templates/multiform-example-generic',
+    ),
+  );
+}
+
+
+/**
+ * Implements hook_form_alter().
+ *
+ * Hide publishing options for sharedfields example nodes' subforms.
+ * @todo:
+ * Check multiform_id itself but not only if form is a subform.
+ */
+function multiform_example_form_alter(&$form, &$form_state, $form_id) {
+  if (in_array($form_id, array('multiform_base_node_form', 'multiform_dependent_node_form'))) {
+    if (!empty($form_state['#multiform'])) {
+      multiform_example_node_form_settings_hide($form);
+    }
+  }
+}
+
+
+/**
+ * Implements hook_module_implements_alter().
+ *
+ * Change hook_form_alter() weight. Required to hide "path alias" settings in
+ * sharedfields example.
+ */
+function multiform_example_module_implements_alter(&$implementations, $hook) {
+  if ($hook == 'form_alter') {
+    $group = $implementations['multiform_example'];
+    unset($implementations['multiform_example']);
+    $implementations['multiform_example'] = $group;
+  }
+}
+
+
+/**
+ * Implements hook_multiform_sharedfields().
+ */
+function multiform_example_multiform_sharedfields($multiform) {
+  $items = array();
+  if ($multiform['#multiform_id'] == 'multiform_sharedfields_example') {
+    $field_names = array(
+      'field_multiform_shared',
+    );
+    foreach ($field_names as $field_name) {
+      $items[] = array(
+        '#dependent' => array(
+          '#tag' => 'multiform_dependent_node_form',
+          '#name' => $field_name,
+          '#parents' => array($field_name),
+          '#array_parents' => array($field_name),
+        ),
+        '#base' => array(
+          '#tag' => 'multiform_base_node_form',
+          '#name' => $field_name,
+          '#parents' => array($field_name),
+          '#array_parents' => array($field_name),
+        ),
+      );
+    }
+  }
+  return $items;
+}
+
+
+/**
+ * First multiform subform.
+ */
+function multiform_example_form_first($form, $form_state) {
+  $form['text'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Text field first'),
+    '#required' => TRUE,
+  );
+  $form['after_execute_enabled'] = array(
+    '#type' => 'radios',
+    '#title' => t('#after_execute demo'),
+    '#options' => array(0 => t('Disabled'), 1 => t('Enabled')),
+    '#default_value' => 0,
+  );
+  $form['submit_first_1'] = array(
+    '#type' => 'submit',
+    '#value' => t('Submit #1 first form'),
+    '#submit' => array('multiform_example_form_first_submit_1'),
+  );
+  $form['submit_first_2'] = array(
+    '#type' => 'submit',
+    '#value' => t('Submit #2 first form'),
+    '#submit' => array('multiform_example_form_first_submit_2'),
+  );
+  return $form;
+}
+
+
+/**
+ * First multiform subform submits.
+ */
+function multiform_example_form_first_submit($form, $form_state) {
+  drupal_set_message('First subform submit triggered.');
+}
+function multiform_example_form_first_submit_1($form, $form_state) {
+  drupal_set_message('First subform submit #1 triggered.');
+}
+function multiform_example_form_first_submit_2($form, $form_state) {
+  drupal_set_message('First subform submit #2 triggered.');
+}
+
+
+/**
+ * Second multiform subform.
+ */
+function multiform_example_form_second($form, $form_state) {
+  $form['text'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Text field second'),
+    '#required' => TRUE,
+  );
+  $form['submit_second_1'] = array(
+    '#type' => 'submit',
+    '#value' => t('Submit #1 second form'),
+    '#submit' => array('multiform_example_form_second_submit_1'),
+  );
+  $form['submit_second_2'] = array(
+    '#type' => 'submit',
+    '#value' => t('Submit #2 second form'),
+    '#submit' => array('multiform_example_form_second_submit_2'),
+  );
+  return $form;
+}
+
+
+/**
+ * Second multiform subform submits.
+ */
+function multiform_example_form_second_submit($form, $form_state) {
+  drupal_set_message('Second subform submit triggered.');
+}
+function multiform_example_form_second_submit_1($form, $form_state) {
+  drupal_set_message('Second subform submit #1 triggered.');
+}
+function multiform_example_form_second_submit_2($form, $form_state) {
+  drupal_set_message('Second subform submit #2 triggered.');
+  drupal_set_message('Value in "Text field second": ' . $form_state['values']['text']);
+}
+
+
+/**
+ * First subform #after_execute function.
+ *
+ * Concatinates text from both subforms' textfields and sets result into second one
+ * if '#after_execute demo' radio is Enabled.
+ */
+function multiform_example_first_subform_after_execute(&$multiform, $index) {
+  $first_subform_state = $multiform['#subforms']['multiform_example_form_first']['form_state'];
+  $first_subform_values = $first_subform_state['values'];
+  if ($first_subform_values['after_execute_enabled']) {
+    drupal_set_message('First subform after execute enabled.');
+    $concatenated_text = $first_subform_state['values']['text'];
+    $second_subform_values =& $multiform['#subforms']['multiform_example_form_second']['form_state']['values'];
+    $second_subform_values['text'] .= $concatenated_text;
+  }
+}
+
+
+/**
+ * Page callback.
+ */
+function multiform_example_page() {
+  module_load_include('inc', 'multiform_example', 'multiform_example.ajax');
+  $settings = array(
+    '#multiform_id' => 'multiform_example_generic',
+    '#subforms' => array(
+      array(
+        'form_id' => 'multiform_example_form_first',
+        '#after_execute' => array('multiform_example_first_subform_after_execute'),
+        '#map' => array(
+          0 => array(
+            '#parents' => array('submit_first_2'),
+            '#triggering_submit' => array('register'),
+          ),
+        ),
+      ),
+      array(
+        'form_id' => 'multiform_example_form_second',
+        '#map' => array(
+          0 => array(
+            '#parents' => array('submit_second_2'),
+            '#triggering_submit' => array('register'),
+          ),
+        ),
+      ),
+      array(
+        'form_id' => 'multiform_ajax_example_form',
+      ),
+    ),
+    '#submit_map' => array(
+      '#submits' => array(
+        'register' => array(
+          '#type' => 'submit',
+          '#value' => t('Register multiform'),
+        ),
+      ),
+    ),
+    '#redirect_path' => '<front>',
+  );
+  return multiform_get_form($settings);
+}
+

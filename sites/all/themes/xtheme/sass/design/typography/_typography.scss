@@ -1,0 +1,91 @@
+/*
+ * Typography
+ * Add your font-related theming in this file.
+ * The actual font declarations go in base > fonts.
+ */
+
+/*
+ * IMPORTANT!
+ * Add all sass files that are needed for your wysiwyg editor here.
+ */
+@import 'tables';
+
+/*
+ * Uses the correct text size when body font-size is set in em units.
+ * Source: http://clagnut.com/blog/348/#c790
+ * Prevents iOS test size to adjust after orientation change.
+ * Source: www.456bereastreet.com/archive/201012/controlling_text_size_in_safari_for_ios_without_disabling_user_zoom
+ */
+html {
+  font-size: 100% * ($base-font-size / 16px);
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Base link settings */
+a {
+  color: $base-link-color;
+
+  &:hover,
+  &:focus {
+    color: $base-link-hover-color;
+  }
+}
+
+/* General settings */
+html {
+  color: $base-text-color;
+  font-family: $base-font-family;
+
+  ::selection,
+  ::-moz-selection {
+    background: $base-selected-text-background-color;
+    color: $base-selected-text-color;
+  }
+}
+
+body{
+  @include px_rem(line-height, $base-line-height);
+  font-size: $base-font-size;
+}
+
+/* Text */
+p {
+
+}
+
+strong {
+
+}
+
+/* Headers */
+h1 {
+  margin: 0.67em 0;
+  @include px_rem(font-size, $fs_1);
+}
+
+h2 {
+  margin: 0.83em 0;
+  @include px_rem(font-size, $fs_2);
+}
+
+h3 {
+  margin: 1em 0;
+  @include px_rem(font-size, $fs_3);
+}
+
+h4 {
+  margin: 1.33em 0;
+  @include px_rem(font-size, $fs_4);
+}
+
+h5 {
+  margin: 1.67em 0;
+  @include px_rem(font-size, $fs_5);
+}
+
+h6 {
+  margin: 2.33em 0;
+  @include px_rem(font-size, $fs_6);
+}
