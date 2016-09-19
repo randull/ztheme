@@ -16,7 +16,7 @@ var gulp        = require('gulp'),
        //domain: 'localhost:3000'
        // For external development (e.g on a mobile or tablet) use an external URL.
        // You will need to update this to whatever BS tells you is the external URL when you run Gulp.
-       domain: 'local.sasstastic.com:3000'
+       domain: 'localhost:3000'
    }
  });
 });

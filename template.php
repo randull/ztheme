@@ -10,7 +10,7 @@
  *
  * Remove all the unused css files.
  */
-function ytheme_css_alter(&$css) {
+function ztheme_css_alter(&$css) {
 
   /* Remove some default Drupal css */
   $exclude = array(
