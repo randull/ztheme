@@ -47,7 +47,7 @@
  */
 ?>
 <?php
-$theme_path = drupal_get_path('theme', 'xtheme');
+$theme_path = drupal_get_path('theme', 'ztheme');
 ?>
 <!doctype html>
 <!--[if IEMobile 7]><html class="ie iem7" lang="<?php print $language->language; ?>" dir="<?php print $language->dir; ?>"><![endif]-->
